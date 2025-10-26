@@ -1,0 +1,792 @@
+{
+  "name": "Telegram Notion Task Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        128
+      ],
+      "id": "34b3273c-721e-488b-9bce-14ee704185ab",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "leqZBEL1m8HX7yLq",
+          "name": "skcet (Mooku) - Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9d302e0c-44e2-4b9e-a3ed-8d21e67945ed",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1232,
+        -48
+      ],
+      "id": "e7d20742-834e-496f-9dda-9789035e7355",
+      "name": "Approval Check (If Approved?)"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {
+          "chatIds": "8464412504"
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1472,
+        -32
+      ],
+      "id": "e8a10ffe-b0ca-4fac-b995-b81675799620",
+      "name": "Telegram: Receive Message",
+      "webhookId": "3d067e88-c55e-46c7-b4cf-5d0cc9c3d540",
+      "credentials": {
+        "telegramApi": {
+          "id": "s9JmQ5AGImJ32oBQ",
+          "name": "abhiman1bot - Telegram"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3fb72ce4-35b2-4997-a369-6a7fd723b36c",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "=",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "667e13a9-4518-4abb-983d-3b6171f35e4f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -1168,
+        -32
+      ],
+      "id": "a396c59a-f7b1-43aa-a8d8-572761967c2a",
+      "name": "Switch: Text or Voice"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "db72eea6-0517-4e77-a8db-dfe433d65fc8",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -608,
+        -176
+      ],
+      "id": "a2dde0cd-d68b-4545-820d-6d2c410ebd40",
+      "name": "Set: Prepare Text"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -832,
+        224
+      ],
+      "id": "17e32a68-39e4-406a-8a98-0e57d8a06ca4",
+      "name": "Telegram: Download Voice File",
+      "webhookId": "c0f4fc71-53b9-4118-a868-0bb40db89a54",
+      "credentials": {
+        "telegramApi": {
+          "id": "s9JmQ5AGImJ32oBQ",
+          "name": "abhiman1bot - Telegram"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        224
+      ],
+      "id": "7225d6e4-e632-4957-96b3-17ee4a7008c3",
+      "name": "Gemini: Transcribe Voice",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "leqZBEL1m8HX7yLq",
+          "name": "skcet (Mooku) - Gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "db72eea6-0517-4e77-a8db-dfe433d65fc8",
+              "name": "text",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -336,
+        224
+      ],
+      "id": "54ee3516-9e72-4b28-9cbe-e82b0c37547a",
+      "name": "Set: Put Transcript into Text"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "TaskName",
+              "description": "The title of the task. Only return a value if it clearly exists; otherwise, leave empty."
+            },
+            {
+              "name": "TaskDue",
+              "type": "date",
+              "description": "The due date of the task. Only return a value if clearly present; otherwise, leave empty."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        -32
+      ],
+      "id": "bf58028e-5018-4105-86c9-5d7495fd22b4",
+      "name": "AI Extractor: TaskName & TaskDue",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "54e99978-984e-479b-a8cd-678ac9dee81f",
+              "leftValue": "={{ $json.output.TaskName }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "f50a2ef0-990d-4740-a0eb-3c2452f8e0d5",
+              "leftValue": "={{ $json.output.TaskDue }}",
+              "rightValue": "",
+              "operator": {
+                "type": "dateTime",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        -32
+      ],
+      "id": "95ed4be7-aa98-4f72-bd87-dd96ed105f2e",
+      "name": "If: Extraction Valid?"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Telegram: Receive Message').item.json.message.chat.id }}",
+        "message": "=Task Name: {{ $json.output.TaskName }}\nDue Date: {{ new Date($json.output.TaskDue).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Approve",
+            "disapproveLabel": "Decline"
+          }
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        832,
+        -48
+      ],
+      "id": "1e2f1750-1704-42fe-82c6-7c25a47dd39a",
+      "name": "Telegram: Ask Approve / Decline",
+      "webhookId": "d3b32ce4-957d-4d3f-b4f0-4d944edbcbcd",
+      "credentials": {
+        "telegramApi": {
+          "id": "s9JmQ5AGImJ32oBQ",
+          "name": "abhiman1bot - Telegram"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "282c6fb7-beaa-80b5-9051-ce57efc79002",
+          "mode": "list",
+          "cachedResultName": "Tasks Testing",
+          "cachedResultUrl": "https://www.notion.so/282c6fb7beaa80b59051ce57efc79002"
+        },
+        "title": "={{ $('AI Extractor: TaskName & TaskDue').item.json.output.TaskName }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Date|date",
+              "includeTime": false,
+              "date": "={{ $('AI Extractor: TaskName & TaskDue').item.json.output.TaskDue }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1616,
+        -64
+      ],
+      "id": "fe396f08-c258-462d-bf61-1f50c3922510",
+      "name": "Notion: Create Task Page",
+      "credentials": {
+        "notionApi": {
+          "id": "lrP3yNJ79AutF43p",
+          "name": "ABHIMAN HQ - Notion"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram: Receive Message').item.json.message.from.id }}",
+        "text": "=✅ Task created in Notion.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1824,
+        -64
+      ],
+      "id": "273da7c6-1dfe-4b70-a9ba-0f66d238d6c6",
+      "name": "Telegram: Notify - Task Created",
+      "webhookId": "96ffe0c6-2a63-4e49-b1eb-93b6be4056fc",
+      "credentials": {
+        "telegramApi": {
+          "id": "s9JmQ5AGImJ32oBQ",
+          "name": "abhiman1bot - Telegram"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram: Receive Message').item.json.message.from.id }}",
+        "text": "=❌ Task not created in Notion.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1248,
+        208
+      ],
+      "id": "f8d85ba2-217b-4d76-8954-c539ed472b9a",
+      "name": "Telegram: Notify - Task Not Created",
+      "webhookId": "97700570-d6ac-4566-a047-751b3a1b5835",
+      "credentials": {
+        "telegramApi": {
+          "id": "s9JmQ5AGImJ32oBQ",
+          "name": "abhiman1bot - Telegram"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram: Receive Message').item.json.message.from.id }}",
+        "text": "=Title or due date cannot be extracted. Please try again.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        224
+      ],
+      "id": "5a32830d-f766-45d3-a330-d058d8ff0d2b",
+      "name": "Telegram: Notify - Extraction Failed",
+      "webhookId": "97700570-d6ac-4566-a047-751b3a1b5835",
+      "credentials": {
+        "telegramApi": {
+          "id": "s9JmQ5AGImJ32oBQ",
+          "name": "abhiman1bot - Telegram"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 💬 Telegram: Receive Message  \nTriggers when a new Telegram message arrives either text or voice and sends the data forward for processing.",
+        "height": 352,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1536,
+        -208
+      ],
+      "id": "772bab86-fb65-490e-a369-0e6c621fb7d0",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## 🔀 Switch: Text or Voice  \nChecks if the message is text or voice and routes it to the matching branch.",
+        "height": 352,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1232,
+        -208
+      ],
+      "id": "515140eb-2d20-44e3-9350-5c8fd044b02f",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## ✏️ Set: Prepare Text  \nExtracts the text message from Telegram and stores it for later processing.",
+        "height": 288,
+        "width": 256,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        -304
+      ],
+      "id": "1d535e73-7312-4a03-b186-d92642568b3b",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## 🎙️ Voice Processing Chain  \n1. **Telegram: Download Voice File:** Downloads the user's voice message from Telegram.  \n2. **Gemini: Transcribe Voice:** Sends the downloaded audio to Google Gemini and transcribes it into text.\n3. **Set: Put Transcript into Text:** Stores the transcribed text for further use in the workflow.  \n\n🔄 Together, these nodes convert voice messages into usable text for automation.",
+        "height": 368,
+        "width": 720,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        32
+      ],
+      "id": "89c4d4ca-548c-4708-93f9-dc24cbb5cb5a",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## 🧠 Task Information Extraction  \n1. **Google Gemini Chat Model** – Powers the AI extraction with Gemini 2.5 Flash Lite.  \n2. **AI Extractor: TaskName & TaskDue** – Identifies and extracts the *task title* and *due date* from the provided text.  \n\n✅ Converts user text into structured task data for Notion or any task system.",
+        "height": 560,
+        "width": 352,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        -288
+      ],
+      "id": "5592afdf-aa6b-4cca-86aa-ad53c15ce6bd",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## ✅ Validate Task Extraction\n1. **If: Extraction Valid?** – Checks if both `TaskName` and `TaskDue` exist from the AI-extracted output.  \n2. **Telegram: Notify - Extraction Failed** – Sends a Telegram message to the user if extraction fails: \"Title or due date cannot be extracted. Please try again.\"  \n\n💡 Ensures only valid tasks proceed and notifies users when extraction is incomplete.",
+        "height": 720,
+        "width": 352,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        288,
+        -288
+      ],
+      "id": "30861b16-0e27-40a2-9273-cf4ca47de3b4",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## 📩 Ask for Task Approval\n- **Telegram: Ask Approve / Decline** – Sends a message with the extracted `TaskName` and `TaskDue` to the user.  \n- Provides **Approve** and **Decline** buttons for double approval.  \n\n💡 Lets users quickly confirm or reject tasks directly via Telegram.",
+        "height": 448,
+        "width": 352,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        704,
+        -288
+      ],
+      "id": "de731a57-c922-4e9b-bf3a-eb797f71180d",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## ✅ Check Task Approval\n- **Approval Check (If Approved?)** – Checks if the user approved the task in Telegram.\n- **Telegram: Notify - Task Not Created** – Notifies the user if the task was declined.",
+        "height": 608,
+        "width": 352,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        -208
+      ],
+      "id": "b1332d50-95e4-4dc7-9923-078ecd4e7ad2",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## 📝 Create Task in Notion\n- **Notion: Create Task Page** – Adds a new page in Notion with the extracted task name and due date.\n- **Telegram: Notify - Task Created** – Confirms to the user that the task was successfully created.",
+        "height": 336,
+        "width": 496,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1536,
+        -208
+      ],
+      "id": "67ff91ca-9c5f-4cff-a253-cebafa5d0cdf",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## 🤖 Conversational Task Manager for Notion (N8NATE Submission)\n\n**Short Description:** An easy-to-use, AI-powered project management system built for the **N8NATE Hackathon**. It allows users to add tasks to **Notion** via **Telegram** using natural language (text or voice), powered by **Google Gemini**.\n\n**Why This Workflow?**\nCreated specifically for the EUPHORIA 2K25 N8NATE challenge, this workflow demonstrates how n8n can build practical, AI-driven tools with minimal friction. The focus is on **ease of use**, allowing anyone to manage tasks conversationally without needing complex commands.\n\n**Technology Stack:**\n* **Orchestration:** n8n.io\n* **AI (Transcription & Extraction):** Google Gemini (Flash Lite)\n* **User Interface:** Telegram Bot API\n* **Task Database:** Notion API\n\n**Functionality:**\nThis workflow acts as a conversational interface for task management:\n1.  **Input:** Receives messages via **Telegram** (text or voice).\n2.  **Transcription:** Uses **Google Gemini** to transcribe voice messages.\n3.  **Extraction:** Employs **Google Gemini** (Information Extractor) to identify the `Task Name` and `Task Due Date`.\n4.  **Validation:** Checks if both pieces of information were successfully extracted.\n5.  **Approval:** Sends the extracted details back to the user on **Telegram** and asks for **Approve** / **Decline** confirmation.\n6.  **Creation:** If approved, creates a new page in the specified **Notion** database.\n7.  **Notification:** Informs the user via **Telegram** about the outcome (success, decline, or extraction failure).\n\n---\n\n**Created By:**\n\n* **Name:** Abhiman G S\n* **College:** Tagore Engineering College\n* **LinkedIn:** [linkedin.com/in/abhimangs](https://www.linkedin.com/in/abhimangs/)\n* **n8n Creator Profile:** [n8n.io/creators/abhimangs](https://n8n.io/creators/abhimangs/)",
+        "height": 864,
+        "width": 576,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1536,
+        -1120
+      ],
+      "id": "5027de04-102a-4651-ba2e-ab1deb95fc76",
+      "name": "Sticky Note9"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Extractor: TaskName & TaskDue",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Check (If Approved?)": {
+      "main": [
+        [
+          {
+            "node": "Notion: Create Task Page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram: Notify - Task Not Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: Receive Message": {
+      "main": [
+        [
+          {
+            "node": "Switch: Text or Voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch: Text or Voice": {
+      "main": [
+        [
+          {
+            "node": "Set: Prepare Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram: Download Voice File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: Prepare Text": {
+      "main": [
+        [
+          {
+            "node": "AI Extractor: TaskName & TaskDue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: Download Voice File": {
+      "main": [
+        [
+          {
+            "node": "Gemini: Transcribe Voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini: Transcribe Voice": {
+      "main": [
+        [
+          {
+            "node": "Set: Put Transcript into Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: Put Transcript into Text": {
+      "main": [
+        [
+          {
+            "node": "AI Extractor: TaskName & TaskDue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Extractor: TaskName & TaskDue": {
+      "main": [
+        [
+          {
+            "node": "If: Extraction Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If: Extraction Valid?": {
+      "main": [
+        [
+          {
+            "node": "Telegram: Ask Approve / Decline",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram: Notify - Extraction Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: Ask Approve / Decline": {
+      "main": [
+        [
+          {
+            "node": "Approval Check (If Approved?)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion: Create Task Page": {
+      "main": [
+        [
+          {
+            "node": "Telegram: Notify - Task Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a888a4e0-ac35-4b25-8f17-3e588f5ee312",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "733e9abfd67f4f2666a76557fe5d7598ae7705aa1e6ff21081cb972137b3c8b4"
+  },
+  "id": "UMVskHQcryGFC3sW",
+  "tags": [
+    {
+      "createdAt": "2025-10-04T12:29:09.131Z",
+      "updatedAt": "2025-10-04T12:29:09.131Z",
+      "id": "JUK6Xu1Fz0PWwGzI",
+      "name": "active"
+    }
+  ]
+}
