@@ -6,10 +6,6 @@
 </p>
 
 <p align="center">
-  <img src="assets/cover-hd.png" alt="n8n Workflows Cover" width="780"/>
-</p>
-
-<p align="center">
   <a href="https://github.com/abhimangs/n8n/releases"><img src="https://img.shields.io/github/v/release/abhimangs/n8n?style=flat" alt="release"></a>
   <a href="https://github.com/abhimangs/n8n/stargazers"><img src="https://img.shields.io/github/stars/abhimangs/n8n?style=flat" alt="stars"></a>
   <a href="https://github.com/abhimangs/n8n/actions"><img src="https://img.shields.io/github/actions/workflow/status/abhimangs/n8n/ci.yml?style=flat" alt="ci"></a>
